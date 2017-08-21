@@ -47,20 +47,18 @@ public class MarvinManager {
     }
     
 	public void sendOembedData(String name,HttpServletRequest request,HttpServletResponse response) {
-		System.out.println("GOT A MARVIN SERVLET REQUEST ! "+name);
 		String type = request.getParameter("type");
 		String format = request.getParameter("format");
 		String url = request.getParameter("url");
-		System.out.println("TYPE="+type);
-		System.out.println("FORMAT="+format);
-		System.out.println("URL="+url);
 		String body="";
-		if (type.equals("euscreen")) {
+		int pos = url.indexOf("/euscreen/");
+		if (pos!=-1) {
+			url=url.substring(pos+10);
+			body = getEUScreenBody(name,url,format);
+		} else if (type.equals("euscreen")) {
 			body = getEUScreenBody(name,url,format);
 		}
 		try {
-
-
 			OutputStream out = response.getOutputStream();
 			out.write(body.getBytes());
 			out.flush();
@@ -76,11 +74,10 @@ public class MarvinManager {
 			reply.put("version","1.0");
 			reply.put("type","video");
 			reply.put("provider_name","Noterik");
-			String domainurl = convertEUScreenId(url);
+			String domainurl = convertEUScreenId(reply,url);
 			System.out.println("DOMAINURL="+domainurl);
-			reply.put("url",domainurl);
 			
-			String html = "<iframe src=\"http://oembed.noterik.com/oembed?url="+domainurl+"\"></iframe>";
+			String html = "<iframe src=\"http://oembed.noterik.com/oembed?url=http://oembed.noterik.com/euscreen"+domainurl+"\"></iframe>";
 			reply.put("html", html);
 			String body=reply.toString();
 			return body;
@@ -88,7 +85,7 @@ public class MarvinManager {
 		return "";
 	}
 	
-	private String convertEUScreenId(String eus) {
+	private String convertEUScreenId(JSONObject reply,String eus) {
 		StringBuilder result = new StringBuilder();
 		try {
 			URL serverUrl = new URL("http://www.euscreen.eu/item.html?id="+eus);
@@ -101,9 +98,29 @@ public class MarvinManager {
 			while ((line = rd.readLine()) != null) {
 				result.append(line);
 			}
-			//System.out.println("RESULT="+result);
 			rd.close();
-			int pos = result.indexOf("images3.noterik.com/domain/euscreenxl");
+			int pos = result.indexOf("<title>");
+			String title  = result.substring(pos+7);
+			pos = title.indexOf("</title>");
+			reply.put("title",title.substring(0,pos));
+			
+			reply.put("width","640");
+			reply.put("height","480");
+			//System.out.println("WWWWW="+result);
+			pos = result.indexOf("/domain/");
+			if (pos!=-1) {
+				String domainurl = result.substring(pos);
+				int pos2=domainurl.indexOf("/shots/");
+				if (pos2!=-1) {
+					domainurl=domainurl.substring(0,pos2);
+					
+					// now find the correct url !
+					//System.out.println("B1="+domainurl);
+					domainurl=getCorrectStream(reply,domainurl);
+					return domainurl;
+				}
+			}
+			pos = result.indexOf("images1.noterik.com/domain/euscreen");
 			if (pos!=-1) {
 				String domainurl = result.substring(pos+19);
 				int pos2=domainurl.indexOf("/shots/");
@@ -111,8 +128,8 @@ public class MarvinManager {
 					domainurl=domainurl.substring(0,pos2);
 					
 					// now find the correct url !
-					
-					domainurl=getCorrectStream(domainurl);
+					//System.out.println("B2="+domainurl);
+					domainurl=getCorrectStream(reply,domainurl);
 					return domainurl;
 				}
 			}
@@ -123,7 +140,7 @@ public class MarvinManager {
 		return null;
 	}
 	
-	private String getCorrectStream(String url) {
+	private String getCorrectStream(JSONObject reply,String url) {
 		StringBuilder result = new StringBuilder();
 		for (int i=4;i<21;i++) {
 			try {
@@ -133,8 +150,9 @@ public class MarvinManager {
 			urlConnection.setDoOutput(true);
 			urlConnection.setRequestMethod("GET");
 			int code = urlConnection.getResponseCode();
-			//System.out.println("CODE="+code);
+			//System.out.println("CODE=http://stream.noterik.com/progressive/stream"+i+"/"+url+"/rawvideo/1/raw.mp4");
 			if (code==403) {
+				reply.put("url","http://stream.noterik.com/progressive/stream"+i+"/"+url+"/rawvideo/1/raw.mp4");
 				return "/stream"+i+url;
 			}
 			} catch(Exception e) {
