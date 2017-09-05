@@ -81,6 +81,9 @@ public class MarvinServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		MarvinManager em = MarvinManager.instance();
+		response.addHeader("Access-Control-Allow-Origin", "*");  
+		response.addHeader("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS");
+		response.addHeader("Access-Control-Allow-Headers", "Content-Type");
 		em.sendOembedData(request.getRequestURI().substring(7),request,response);
 		return;
 	}
