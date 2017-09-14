@@ -10,3 +10,7 @@
 *.jar
 
 *.jar
+
+*.class
+
+*.war

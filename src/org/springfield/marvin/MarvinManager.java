@@ -60,12 +60,18 @@ public class MarvinManager {
 		String format = request.getParameter("format");
 		String url = request.getParameter("url");
 		String body="";
-		int pos = url.indexOf("/euscreen/");
+		int pos = url.indexOf("item.html");
 		if (pos!=-1) {
-			url=url.substring(pos+10);
+			url=url.substring(pos+13);
 			body = getEUScreenBody(request,name,url,format);
-		} else if (type.equals("euscreen")) {
-			body = getEUScreenBody(request,name,url,format);
+		} else {
+			pos = url.indexOf("/euscreen/");
+			if (pos!=-1) {
+				url=url.substring(pos+10);
+				body = getEUScreenBody(request,name,url,format);
+			} else if (type.equals("euscreen")) {
+				body = getEUScreenBody(request,name,url,format);
+			}
 		}
 		try {
 			OutputStream out = response.getOutputStream();
@@ -92,9 +98,12 @@ public class MarvinManager {
 			
 			Boolean valid = false;
 
+			/*
 			if (referer.startsWith("http://oembed.euscreen.eu")) {
-				valid = true;
 			}
+			*/
+				valid = true;
+	
 
 			if (valid) {
 				String random = ""+generator.nextInt(999999999);
