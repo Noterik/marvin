@@ -84,6 +84,7 @@ public class MarvinServlet extends HttpServlet {
 		response.addHeader("Access-Control-Allow-Origin", "*");  
 		response.addHeader("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS");
 		response.addHeader("Access-Control-Allow-Headers", "Content-Type");
+		response.setContentType("application/json");
 		em.sendOembedData(request.getRequestURI().substring(7),request,response);
 		return;
 	}
