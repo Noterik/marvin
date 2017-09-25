@@ -99,7 +99,7 @@ public class MarvinManager {
 			Boolean valid = false;
 
 			/*
-			if (referer.startsWith("http://oembed.euscreen.eu")) {
+			if (referer.startsWith("https://oembed.euscreen.eu")) {
 			}
 			*/
 				valid = true;
@@ -112,10 +112,10 @@ public class MarvinManager {
 				newticket.setProperty("expire",""+(new Date().getTime()/1000)+5);
 				newticket.setProperty("url",""+domainurl);
 				Fs.insertNode(newticket,"/domain/oembed/service/marvin/");
-				String html = "<iframe width=\"640\" height=\"480\" src=\"http://oembed.euscreen.eu/oembed?url="+domainurl+"&ticket="+ticket+"\"></iframe>";
+				String html = "<iframe width=\"640\" height=\"480\" src=\"https://oembed.euscreen.eu/oembed?url="+domainurl+"&ticket="+ticket+"\"></iframe>";
 				reply.put("html", html);
 			} else {
-				String html = "<iframe width=\"640\" height=\"480\" src=\"http://oembed.euscreen.eu/oembed?url="+domainurl+"\"></iframe>";
+				String html = "<iframe width=\"640\" height=\"480\" src=\"https://oembed.euscreen.eu/oembed?url="+domainurl+"\"></iframe>";
 				reply.put("html", html);
 			}
 			String body=reply.toString();
@@ -152,13 +152,13 @@ public class MarvinManager {
 						result = result.substring(pos+12);
 						pos = result.indexOf("/rawvideo/");
 						if (pos!=-1) {
-							return "http://oembed.euscreen.eu/euscreen"+result.substring(0,pos);
+							return "https://oembed.euscreen.eu/euscreen"+result.substring(0,pos);
 						}
 					} else {
 						return result;
 					}
 				} else {
-					return "http://oembed.euscreen.eu/euscreen/"+mount+euscreennode.getPath();
+					return "https://oembed.euscreen.eu/euscreen/"+mount+euscreennode.getPath();
 				}
 			} else {
 				System.out.println("PROBLEM CAN'T FIND RAW VIDEO FOR THIS ID="+url);
