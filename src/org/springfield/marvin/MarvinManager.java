@@ -159,17 +159,17 @@ public class MarvinManager {
 		if (pos!=-1) {
 		    mount = mount.substring(0,pos);
 		}
-		if (mount.indexOf("http://")!=-1) {
+		if (mount.indexOf("http://") != -1 || mount.indexOf("https://") != -1) {
 		    String result = mount;
 		    pos = result.indexOf("/progressive/");
 		    if (pos!=-1) {
-			result = result.substring(pos+12);
-			pos = result.indexOf("/raw"+type+"/");
-			if (pos!=-1) {
-			    return "https://oembed.euscreen.eu/euscreen"+result.substring(0,pos);
-			}
+		    	result = result.substring(pos+12);
+				pos = result.indexOf("/raw"+type+"/");
+				if (pos!=-1) {
+					return "https://oembed.euscreen.eu/euscreen"+result.substring(0,pos);
+				}
 		    } else {
-			return result;
+		    	return result;
 		    }
 		} else {
 		    return "https://oembed.euscreen.eu/euscreen/"+mount+euscreenItem.getPath();
